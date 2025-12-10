@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nghe Radio VOV</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- hls.js để phát HLS trên Chrome/Edge -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">  
+
+<div class="container mx-auto px-4 py-6 md:py-10 max-w-2xl">
+    
+    <!-- Header -->
+    <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+        <h1 class="text-3xl md:text-4xl font-bold text-center text-indigo-600 mb-2">
+            🎧 Nghe Radio VOV
+        </h1>
+        <p class="text-center text-gray-600 text-sm md:text-base">
+            Chọn kênh để nghe trực tuyến
+        </p>
+    </div>
+
+    <!-- Currently Playing Status -->
+    <div id="nowPlaying" class="bg-green-600 text-white rounded-xl shadow-lg p-4 mb-6 hidden">
+        <div class="flex items-center justify-center gap-2">
+            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 7H7a2 2 0 00-2 2v2a2 2 0 002 2h2l4 3V4l-4 3z" />
+            </svg>
+            <span class="font-semibold text-lg">Đang phát:</span>
+            <span id="currentChannel" class="ml-2 font-bold text-lg"></span>
+        </div>
+    </div>
+
+    <!-- Channel Buttons -->
+    <div class="bg-white rounded-2xl shadow-xl p-4 md:p-6 mb-6">
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+            <button class="btn bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-200 transform hover:scale-105 active:scale-95" 
+                    data-url="https://audio-lss.vov.vn/han/live/vov1/audio/manifest.m3u8" 
+                    data-name="VOV1">
+                VOV1
+            </button>
+            <button class="btn bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-200 transform hover:scale-105 active:scale-95" 
+                    data-url="https://media-audio.vov.vn/vov2.sdp_aac/playlist.m3u8" 
+                    data-name="VOV2">
+                VOV2
+            </button>
+            <button class="btn bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-200 transform hover:scale-105 active:scale-95" 
+                    data-url="https://media-audio.vov.vn/vov3.sdp_aac/playlist.m3u8" 
+                    data-name="VOV3">
+                VOV3
+            </button>
+            <button class="btn bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-200 transform hover:scale-105 active:scale-95" 
+                    data-url="https://media-audio.vov.vn/vov5.sdp_aac/playlist.m3u8" 
+                    data-name="VOV5">
+                VOV5
+            </button>
+            <button class="btn bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-200 transform hover:scale-105 active:scale-95" 
+                    data-url="https://media-audio.vov.vn/vovGTHN.sdp_aac/playlist.m3u8" 
+                    data-name="VOV GT Hà Nội">
+                VOV GT HN
+            </button>
+            <button class="btn bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-200 transform hover:scale-105 active:scale-95" 
+                    data-url="https://play.vovgiaothong.vn/live/gthcm/playlist.m3u8" 
+                    data-name="VOV GT HCM">
+                VOV GT HCM
+            </button>
+             <button class="btn bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-200 transform hover:scale-105 active:scale-95" 
+                    data-url="https://play.vovgiaothong.vn/live/duyenhai/playlist.m3u8" 
+                    data-name="VOV duyenhai">
+                VOV duyenhai
+            </button>
+         
+        </div>
+    </div>
+
+    <!-- Audio Player -->
+    <div class="bg-white rounded-2xl shadow-xl p-4 md:p-6">
+        <audio id="player" controls autoplay class="w-full"></audio>
+    </div>
+
+</div>
+
+<script>
+$(function() {
+    let audio = document.getElementById("player");
+    let hls;
+
+    $(".btn").click(function() {
+        let streamUrl = $(this).data("url");
+        let channelName = $(this).data("name");
+        
+        // Remove active state from all buttons
+        $(".btn").removeClass("!bg-green-500 ring-4 ring-green-300");
+        
+        // Add active state to clicked button
+        $(this).addClass("!bg-green-500 ring-4 ring-green-300");
+        
+        // Show now playing status
+        $("#nowPlaying").removeClass("hidden");
+        $("#currentChannel").text(channelName);
+        
+        playStream(streamUrl);
+    });
+
+    function playStream(url) {
+        if (hls) {
+            hls.destroy();
+        }
+
+        if (Hls.isSupported()) {
+            hls = new Hls();
+            hls.loadSource(url);
+            hls.attachMedia(audio);
+        } else {
+            // Safari hỗ trợ tự nhiên
+            audio.src = url;
+        }
+
+        audio.play();
+    }
+});
+</script>
+
+</body>
+</html>
